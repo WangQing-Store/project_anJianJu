@@ -37,6 +37,7 @@
       style="text-align:right;margin-top:10px"
       show-size-changer
       show-quick-jumper
+      :show-total="total => `共 ${total} 条`"
       :page-size-options="['10', '20', '30', '40', '50']"
       v-model:current="current"
       v-model:page="page"
@@ -109,7 +110,7 @@ import {
   updatePersonnel,
 } from '@/api/system/person';
 import { RES_OK } from '@/api/config';
-import tableComponent from '@/components/aTable/index.vue';
+import tableComponent from '@/components/aTable/index.vue'
 import { getByKey } from '@/api/common/common';
 import formComponent from '@/components/aForm/index.vue';
 import { message } from 'ant-design-vue';
@@ -340,6 +341,26 @@ export default defineComponent({
       unitType: 1,
       updateTime: undefined,
     });
+    // 重置表单数据
+    let resetFormData = () => {
+      formData.value = {
+        age: '',
+        companyId: '',
+        companyName: '',
+        createTime: undefined,
+        department: '',
+        email: '',
+        id: '',
+        isEnable: true,
+        isOfficers: true,
+        name: '',
+        officersNumber: '',
+        phone: '',
+        sex: true,
+        unitType: 1,
+        updateTime: undefined,
+      };
+    };
     // 人员信息标题
     let personnelTitle = ref('');
     let btnAction: any = ref('');
@@ -348,9 +369,7 @@ export default defineComponent({
       PersonnelVisible.value = true;
       personnelTitle.value = '添加人员信息';
       btnAction.value = true;
-      nextTick(() => {
-        ctx.$refs.personnelName.resetFormFields();
-      });
+      resetFormData();
     };
     // 添加人员信息表单配置
     let formConfigure = ref([
@@ -395,8 +414,18 @@ export default defineComponent({
       },
       {
         type: 'textOrSelect',
+        label: () => {
+          return formData.value.unitType == 1 ? '部门' : '企业';
+        },
+        placeholder: () => {
+          return formData.value.unitType == 1 ? '请输入部门' : '请选择企业';
+        },
+        value: () => {
+          return formData.value.unitType == 1 ? 'department' : 'companyId';
+        },
         width: 45,
         key: 'unitType',
+        selectValue: 'id',
       },
       {
         label: '是否执法人员',
@@ -473,7 +502,10 @@ export default defineComponent({
       } else {
         formData.value.createTime = undefined;
         formData.value.updateTime = undefined;
-        const res = await updatePersonnel(formData.value);
+        let obj: any = Object.assign({}, formData.value);
+        delete obj.button;
+        delete obj.number;
+        const res = await updatePersonnel(obj);
         if (res.data.code == RES_OK) {
           PersonnelVisible.value = false;
           getPersonnelInfo();

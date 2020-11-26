@@ -5,11 +5,16 @@
     :rules="rules"
     :ref="refName"
   >
-    <!-- 文本框 -->
     <template
       v-for="(item,index) of formConfigure"
       :key="index"
     >
+      <!-- 自定义插槽 -->
+      <template v-if="item.type=='slot'">
+        <slot :name="'form'+item.slotName"></slot>
+      </template>
+
+      <!-- 文本框 -->
       <a-form-item
         :label="item.label"
         v-if="item.type=='text'"
@@ -22,6 +27,8 @@
           v-model:value="formData[item.value]"
         />
       </a-form-item>
+
+      <!-- textarea -->
       <a-form-item
         :label="item.label"
         v-if="item.type=='textarea'"
@@ -35,12 +42,7 @@
         />
       </a-form-item>
 
-    </template>
-    <!-- 下拉选择框 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+      <!-- 下拉选择框 -->
       <a-form-item
         :label="item.label"
         v-if="item.type=='select'"
@@ -54,18 +56,14 @@
           <a-select-option
             v-for="val of optionData[item.value]"
             :key="val.id"
-            :value="val.id"
+            :value="val[item.selectValue]"
           >
             {{val.name}}
           </a-select-option>
         </a-select>
       </a-form-item>
-    </template>
-    <!-- 时间选择框 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+
+      <!-- 时间选择框 -->
       <a-form-item
         v-if="item.type=='date'"
         :label="item.label"
@@ -79,12 +77,8 @@
           :placeholder="item.placeholder"
         />
       </a-form-item>
-    </template>
-    <!-- 开关 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+
+      <!-- 开关 -->
       <a-form-item
         v-if="item.type=='switch'"
         :label="item.label"
@@ -93,12 +87,8 @@
       >
         <a-switch v-model:checked="formData[item.value]" />
       </a-form-item>
-    </template>
-    <!-- 复选框 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+
+      <!-- 复选框 -->
       <a-form-item
         v-if="item.type=='checkbox'"
         :label="item.label"
@@ -116,12 +106,8 @@
           </a-checkbox>
         </a-checkbox-group>
       </a-form-item>
-    </template>
-    <!-- 单选框 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+
+      <!-- 单选框 -->
       <a-form-item
         v-if="item.type=='radio'"
         :label="item.label"
@@ -138,41 +124,37 @@
           </a-radio>
         </a-radio-group>
       </a-form-item>
-    </template>
-    <!-- 文本框或者下拉框 -->
-    <template
-      v-for="(item,index) of formConfigure"
-      :key="index"
-    >
+
+      <!-- 文本框或者下拉框 -->
       <template v-if="item.type=='textOrSelect'">
         <!-- 文本框 -->
         <a-form-item
-          label="部门"
+          :label="item.label()"
           :style="{'width':item.width+'%'}"
           v-if="formData[item.key]==1"
           :name="item.value"
         >
           <a-input
-            placeholder="请输入部门"
+            :placeholder="item.placeholder()"
             type="text"
-            v-model:value="formData['department']"
+            v-model:value="formData[item.value()]"
           />
         </a-form-item>
         <!-- 下拉框 -->
         <a-form-item
-          label="企业"
+          :label="item.label()"
           :style="{'width':item.width+'%'}"
           v-if="formData[item.key]==2"
           :name="item.value"
         >
           <a-select
-            v-model:value="formData['companyId']"
-            placeholder="请选择企业"
+            v-model:value="formData[item.value()]"
+            :placeholder="item.placeholder()"
           >
             <a-select-option
-              v-for="val of optionData['companyId']"
+              v-for="val of optionData[item.value()]"
               :key="val.id"
-              :value="val.id"
+              :value="val[item.selectValue]"
             >
               {{val.name}}
             </a-select-option>

@@ -38,6 +38,7 @@
       style="text-align:right;margin-top:10px"
       show-size-changer
       show-quick-jumper
+      :show-total="total => `共 ${total} 条`"
       :page-size-options="['10','20', '30', '40', '50']"
       v-model:current="current"
       v-model:page="roleObj.page"
@@ -171,6 +172,20 @@ export default defineComponent({
       type: '',
       updateTime: undefined,
     });
+    // 重置表单数据
+    let resetFormData = () => {
+      formData.value = {
+        createId: '',
+        createName: '',
+        createTime: undefined,
+        id: '',
+        isEnable: true,
+        name: '',
+        remark: '',
+        type: '',
+        updateTime: undefined,
+      };
+    };
     // 表单配置
     let formConfigure = ref([
       {
@@ -209,9 +224,7 @@ export default defineComponent({
       roleTitle.value = '添加角色';
       roleVisible.value = true;
       buttonSelect.value = true;
-      nextTick(() => {
-        ctx.$refs.roleName.resetFormFields();
-      });
+      resetFormData();
     };
     // 确认
     let roleHandleOk = async () => {

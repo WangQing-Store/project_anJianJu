@@ -31,12 +31,14 @@
       :rowKey="'id'"
       @btnSeletion="btnSeletion"
       @changeSwitch="changeSwitch"
-    ></tableComponent>
+    >
+    </tableComponent>
     <!-- 分页器 -->
     <a-pagination
       style="text-align:right;margin-top:10px"
       show-size-changer
       show-quick-jumper
+      :show-total="total => `共 ${total} 条`"
       :page-size-options="['10', '20', '30', '40', '50']"
       v-model:current="current"
       v-model:page="UserObj.page"
@@ -277,6 +279,23 @@ export default defineComponent({
       updateTime: undefined,
       username: '',
     });
+    // 重置表单数据
+    let resetFormData = () => {
+      formData.value = {
+        createId: '',
+        createTime: undefined,
+        id: '',
+        isEnable: '',
+        password: '',
+        confirmPassword: '',
+        personnel: {},
+        personnelId: '',
+        roleId: '',
+        roleName: '',
+        updateTime: undefined,
+        username: '',
+      };
+    };
     // 模态框标题
     let userTitle = ref('');
     // 控制模态框显示隐藏
@@ -296,6 +315,7 @@ export default defineComponent({
         placeholder: '请选择角色',
         value: 'roleId',
         width: 45,
+        selectValue: 'id',
       },
       {
         label: '关联人员',
@@ -303,6 +323,7 @@ export default defineComponent({
         placeholder: '请选择关联人员',
         value: 'personnelId',
         width: 45,
+        selectValue: 'id',
       },
       {
         label: '输入密码',
@@ -419,9 +440,7 @@ export default defineComponent({
         },
       ];
       btnAction.value = true;
-      nextTick(() => {
-        ctx.$refs.addUserInfoRef.resetFormFields();
-      });
+      resetFormData();
     };
     // 表单提交
     let userHandleOk = () => {
